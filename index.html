@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPACERS ASTRONOMY TERMINAL v2.0</title>
+    <title>SPACERS ASTRONOMY TERMINAL v3.0</title>
     <style>
         :root {
             --neon-green: #00ff41;
@@ -44,15 +44,12 @@
             color: #aaa;
             font-size: 12px;
         }
-        .ad-link {
-            color: var(--neon-pink);
-            text-decoration: none;
-            font-weight: bold;
-        }
+        .ad-link { color: var(--neon-pink); text-decoration: none; font-weight: bold; }
+        
         .main-container {
             display: flex;
             gap: 20px;
-            max-width: 1400px;
+            max-width: 1500px;
             width: 100%;
             flex-wrap: wrap;
             justify-content: center;
@@ -63,7 +60,7 @@
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
             border-radius: 8px;
             padding: 20px;
-            min-width: 320px;
+            min-width: 300px;
             flex: 1;
         }
         .btn {
@@ -78,11 +75,7 @@
             text-transform: uppercase;
             box-shadow: 0 0 5px var(--neon-green);
         }
-        .btn:hover {
-            background: var(--neon-green);
-            color: #000;
-            box-shadow: 0 0 15px var(--neon-green);
-        }
+        .btn:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
         .btn-pink { border-color: var(--neon-pink); color: var(--neon-pink); box-shadow: 0 0 5px var(--neon-pink); }
         .btn-pink:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 15px var(--neon-pink); }
         
@@ -99,6 +92,40 @@
             width: 100%;
             box-sizing: border-box;
         }
+        
+        /* Çoklu Kanal Arayüz Elementleri */
+        .room-list {
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px dashed var(--neon-blue);
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #09090e;
+        }
+        .room-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #000;
+            border: 1px solid #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .room-item:hover, .room-item.active {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+            color: #fff;
+        }
+        .room-badge {
+            background: var(--neon-pink);
+            color: #000;
+            font-size: 10px;
+            padding: 2px 5px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
         #chat-area {
             height: 250px;
             border: 1px solid var(--neon-green);
@@ -109,25 +136,14 @@
             margin-bottom: 10px;
         }
         .system-msg { color: var(--neon-blue); }
-        .user-msg { color: #fff; cursor: pointer; }
-        .user-msg:hover { text-decoration: underline; }
+        .user-msg { color: #fff; }
         .ai-msg { color: var(--neon-green); }
         .error-msg { color: var(--neon-pink); font-weight: bold; }
         .admin-msg { color: #ffff00; font-weight: bold; text-shadow: 0 0 5px #ffff00; }
         .category-tag { background: #222; padding: 2px 6px; font-size: 11px; border-radius: 3px; margin-left: 5px; }
         
-        #admin-hardware-panel, #admin-control-panel {
-            display: none;
-            border-color: var(--neon-pink);
-        }
-        .profile-card {
-            background: #111;
-            border: 1px solid var(--neon-blue);
-            padding: 10px;
-            margin-top: 10px;
-            text-align: left;
-            display: none;
-        }
+        #admin-hardware-panel, #admin-actions { display: none; }
+        .profile-card { background: #111; border: 1px solid var(--neon-blue); padding: 10px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -137,7 +153,7 @@
         <a href="https://celestron.com" target="_blank" class="ad-link">Mavi Canavar Ekipmanları ve Parçaları İçin Tıkla!</a>
     </div>
 
-    <h1 id="main-title">🚀 SPACERS CORE INTERFACE v2.0</h1>
+    <h1 id="main-title">🚀 SPACERS CORE INTERFACE v3.0</h1>
     <div class="subtitle">System Status: Connected // Operator: Muhammed Savuran</div>
 
     <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
@@ -150,8 +166,7 @@
         
         <div class="panel">
             <h3 style="color: var(--neon-blue);">🔍 PROFİL GÖZLEM & MATRIX</h3>
-            <p style="font-size: 11px; color: #aaa;">Mesaj atan birinin ismine tıklayarak veya aşağıya yazarak profilini incele.</p>
-            <input type="text" id="search-user" placeholder="Kullanıcı Adı Yaz...">
+            <input type="text" id="search-user" placeholder="Kullanıcı Adı...">
             <button class="btn" onclick="viewProfile()">Profili İncele</button>
             
             <div id="profile-display" class="profile-card">
@@ -160,31 +175,31 @@
                 <p id="prof-status" style="margin: 5px 0;">Durum: Aktif</p>
                 <p id="prof-warns" style="margin: 5px 0;">Ceza Puanı: 0</p>
                 
-                <div id="admin-actions" style="display: none; margin-top: 10px; border-top: 1px dashed var(--neon-pink); padding-top: 10px;">
+                <div id="admin-actions" style="margin-top: 10px; border-top: 1px dashed var(--neon-pink); padding-top: 10px;">
                     <button class="btn btn-pink" onclick="adminBan()">BANLA (Siteden At)</button>
                     <button class="btn btn-pink" onclick="adminMute()">CEZALANDIR (Sustur)</button>
-                    <button class="btn" onclick="adminResetWarns()" style="border-color:#ffff00; color:#ffff00;">CEZALARI SIFIRLA</button>
                 </div>
             </div>
         </div>
 
-        <div class="panel" id="admin-hardware-panel">
-            <h3 style="color: var(--neon-pink);">⚡ SPACER ADMIN LINK (ESP32 SECURE)</h3>
-            <input type="text" id="espIp" value="http://192.168.4.1" placeholder="ESP32 IP">
-            <hr style="border-color: var(--neon-pink);">
-            <h4>Eksen Manuel Manevra</h4>
-            <button class="btn btn-pink" onclick="sendHardware('/ra_forward')">RA +</button>
-            <button class="btn btn-pink" onclick="sendHardware('/ra_backward')">RA -</button>
-            <br>
-            <button class="btn btn-pink" onclick="sendHardware('/dec_up')">DEC +</button>
-            <button class="btn btn-pink" onclick="sendHardware('/dec_down')">DEC -</button>
+        <div class="panel">
+            <h3 style="color: var(--neon-pink);">💬 SOHBET ODALARI & BAŞLIKLAR</h3>
+            <p style="font-size: 11px; color: #aaa;">Girmek istediğin başlığa tıkla, orada konuşmaya başla.</p>
+            
+            <div class="room-list" id="rooms-container">
+                </div>
+
+            <hr style="border-color: var(--neon-pink); margin: 15px 0;">
+            <h4>Yeni Sohbet Başlığı Aç</h4>
+            <input type="text" id="new-room-title" placeholder="Başlık Yaz (Örn: Satürn Mercek Seçimi)">
+            <button class="btn btn-pink" onclick="createNewRoom()">Başlığı Oluştur ve Katıl</button>
         </div>
 
         <div class="panel" id="chat-panel">
-            <h3 style="color: var(--neon-green);">🤖 SPACER AI CORE & FORUM</h3>
-            <div id="chat-area">
-                <p class="system-msg">[SİSTEM] Terminal Aktif. İsimlere tıklayarak profillere bakabilirsin. Küfür yasaktır!</p>
-            </div>
+            <h3 style="color: var(--neon-green); margin-bottom: 5px;">🤖 SPACER AI CORE & FORUM</h3>
+            <div style="font-size: 13px; color: var(--neon-blue); margin-bottom: 10px;" id="current-room-indicator">Mevcut Oda: #Genel-Sohbet</div>
+            
+            <div id="chat-area"></div>
 
             <label for="category-select">Mevcut Astronomi Sınıfı:</label>
             <select id="category-select">
@@ -193,10 +208,19 @@
                 <option value="Profesyonel Astronom">Profesyonel Astronom</option>
             </select>
 
-            <textarea id="chat-input" rows="2" placeholder="Mesajınızı buraya yazın..."></textarea>
+            <textarea id="chat-input" rows="2" placeholder="Seçili odaya mesaj gönder..."></textarea>
             <button class="btn" onclick="processMessage()">Gönder</button>
-            <button class="btn btn-pink" onclick="toggleChat()">Sohbeti Kapat</button>
-            <button class="btn btn-admin" id="clear-chat-btn" onclick="adminClearChat()">SOHBETİ TEMİZLE (ADMIN)</button>
+            <button class="btn btn-admin" id="clear-chat-btn" onclick="adminClearChat()">ODAYI TEMİZLE</button>
+        </div>
+
+        <div class="panel" id="admin-hardware-panel">
+            <h3 style="color: var(--neon-pink);">⚡ SPACER ADMIN LINK (ESP32)</h3>
+            <input type="text" id="espIp" value="http://192.168.4.1" placeholder="ESP32 IP">
+            <hr style="border-color: var(--neon-pink);">
+            <button class="btn btn-pink" onclick="sendHardware('/ra_forward')">RA +</button>
+            <button class="btn btn-pink" onclick="sendHardware('/ra_backward')">RA -</button>
+            <button class="btn btn-pink" onclick="sendHardware('/dec_up')">DEC +</button>
+            <button class="btn btn-pink" onclick="sendHardware('/dec_down')">DEC -</button>
         </div>
 
     </div>
@@ -204,43 +228,169 @@
     <script>
         const bannedWords = ["amk", "aq", "skm", "piç", "sik", "orospu", "oç", "pç"]; 
         let isAdmin = false;
+        let activeRoom = "Genel-Sohbet"; // Varsayılan aktif oda
 
-        // Simüle Kullanıcı Veri Tabanı (Profil Özelliği İçin)
-        let userDatabase = {
-            "Spacer_Gurbetci": { rank: "Amatör Astronom", status: "Aktif", warns: 0, banyok: true },
-            "İhsan_Spacer": { rank: "Profesyonel Astronom", status: "Aktif", warns: 0, banyok: true },
-            "Teleskop_Bebesi": { rank: "Başlangıç Astronom", status: "Aktif", warns: 2, banyok: true }
+        // Gelişmiş Çoklu Oda Veri Tabanı Mimarisi
+        let chatRooms = {
+            "Genel-Sohbet": [
+                { sender: "SİSTEM", text: "[SİSTEM] Genel Astronomi odasına hoş geldiniz. İsimlere tıklayarak profillere bakabilirsiniz.", type: "system-msg" }
+            ],
+            "Teleskop-Modifikasyon": [
+                { sender: "SİSTEM", text: "[SİSTEM] Kundak, motor sürücüler ve optik ayarlar bu odada konuşulur.", type: "system-msg" },
+                { sender: "İhsan_Spacer", text: "OnStep sürücü kartı sipariş ettim, kargo bekliyorum.", type: "user-msg" }
+            ],
+            "Derin-Uzay-Gözlem": [
+                { sender: "SİSTEM", text: "[SİSTEM] Bulutsular, galaksiler ve gözlem deneyimleri odası.", type: "system-msg" }
+            ]
         };
 
-        // ADMİN GİRİŞİ VE ÖZEL YETKİLERİN TETİKLENMESİ
+        let userDatabase = {
+            "Spacer_Gurbetci": { rank: "Amatör Astronom", status: "Aktif", warns: 0, banyok: true },
+            "İhsan_Spacer": { rank: "Profesyonel Astronom", status: "Aktif", warns: 0, banyok: true }
+        };
+
+        // SİSTEM BAŞLANGICI
+        window.onload = function() {
+            renderRooms();
+            loadRoomChat(activeRoom);
+        };
+
+        // ODALARI LİSTELEME FONKSİYONU
+        function renderRooms() {
+            let container = document.getElementById('rooms-container');
+            container.innerHTML = "";
+            for (let roomName in chatRooms) {
+                let activeClass = roomName === activeRoom ? "active" : "";
+                let msgCount = chatRooms[roomName].length;
+                container.innerHTML += `
+                    <div class="room-item ${activeClass}" onclick="switchRoom('${roomName}')">
+                        <span># ${roomName}</span>
+                        <span class="room-badge">${msgCount} msg</span>
+                    </div>
+                `;
+            }
+        }
+
+        // ODA DEĞİŞTİRME MEKANİZMASI
+        function switchRoom(roomName) {
+            activeRoom = roomName;
+            document.getElementById('current-room-indicator').innerText = `Mevcut Oda: #${roomName}`;
+            renderRooms();
+            loadRoomChat(roomName);
+        }
+
+        // ODA SOHBETİNİ EKRANA YÜKLEME
+        function loadRoomChat(roomName) {
+            let chatArea = document.getElementById('chat-area');
+            chatArea.innerHTML = "";
+            chatRooms[roomName].forEach(msg => {
+                if(msg.type === "system-msg") {
+                    chatArea.innerHTML += `<p class="system-msg"><strong>[${msg.sender}]:</strong> ${msg.text}</p>`;
+                } else {
+                    chatArea.innerHTML += `<p class="${msg.type}"><strong>[<span onclick="viewProfile('${msg.sender}')" style="cursor:pointer; text-decoration:underline;">${msg.sender}</span>]:</strong> ${msg.text}</p>`;
+                }
+            });
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // YENİ BAŞLIK/ODA OLUŞTURMA FONKSİYONU
+        function createNewRoom() {
+            let input = document.getElementById('new-room-title');
+            let rawTitle = input.value.trim();
+            if(rawTitle === "") return;
+
+            // Boşlukları siberpunk tarzı tireye çeviriyoruz
+            let formattedTitle = rawTitle.replace(/\s+/g, '-');
+
+            if(chatRooms[formattedTitle]) {
+                alert("Bu başlıkta bir oda zaten mevcut!");
+                return;
+            }
+
+            // Veritabanına yeni oda ekleme
+            chatRooms[formattedTitle] = [
+                { sender: "SİSTEM", text: `[SİSTEM] #${formattedTitle} odası başarıyla kuruldu. Moderatör: Muhammed`, type: "system-msg" }
+            ];
+
+            input.value = "";
+            switchRoom(formattedTitle); // Otomatik o odaya geçiş yap
+        }
+
+        // ADMİN GİRİŞİ
         function loginAdmin() {
             let passInput = document.getElementById('admin-pass-input').value;
             let currentUsername = document.getElementById('username-input').value;
 
             if(passInput === "145313131920") {
                 isAdmin = true;
-                // Panelleri Açıyoruz
                 document.getElementById('admin-hardware-panel').style.display = "block";
                 document.getElementById('admin-actions').style.display = "block";
                 document.getElementById('clear-chat-btn').style.display = "inline-block";
                 document.getElementById('admin-pass-input').value = "";
                 
-                // Admini sisteme kaydet/güncelle
                 userDatabase[currentUsername] = { rank: "KURUCU BAŞKOMUTAN", status: "Sınırsız Yetki", warns: 0, banyok: true };
                 
-                logToChat("SİSTEM", `ADMIN YETKİSİ ONAYLANDI! Hoş geldin ${currentUsername}.`, "admin-msg");
-                alert("Kurucu yetkileri ve Moderasyon Matrisi aktif edildi!");
+                switchRoom(activeRoom); // Arayüzü tazele
+                alert("Kurucu ve Çoklu Kanal Moderasyon yetkileri aktif!");
             } else {
-                alert("Hatalı Şifre! Güvenlik Protokolü Devreye Girdi.");
+                alert("Şifre Reddedildi!");
             }
         }
 
-        // PROFİL BAKMA FONKSİYONU
+        // MESAJ GÖNDERME VE AKILLI SİSTEM
+        function processMessage() {
+            let inputField = document.getElementById('chat-input');
+            let user = document.getElementById('username-input').value;
+            let rawText = inputField.value;
+            let currentCategory = document.getElementById('category-select').value;
+
+            if(rawText.trim() === "") return;
+
+            // Koruma Blokajları
+            if(userDatabase[user] && userDatabase[user].banyok === false) { alert("BANLISINIZ!"); return; }
+            if(userDatabase[user] && userDatabase[user].status === "CEZALI (SUSTURULDU)") { alert("CEZALISINIZ!"); return; }
+
+            // Küfür Kontrolü
+            let cleanText = rawText.toLowerCase();
+            if(bannedWords.some(word => cleanText.includes(word))) {
+                alert("Küfür yasaktır! Ceza puanı aldınız.");
+                if(!userDatabase[user]) userDatabase[user] = { rank: currentCategory, status: "Aktif", warns: 0, banyok: true };
+                userDatabase[user].warns += 1;
+                inputField.value = "";
+                return;
+            }
+
+            let msgClass = isAdmin ? "admin-msg" : "user-msg";
+
+            // İlgili odanın hafızasına mesajı push et
+            chatRooms[activeRoom].push({
+                sender: user,
+                text: rawText + ` <span class="category-tag">[${currentCategory}]</span>`,
+                type: msgClass
+            });
+
+            // Akıllı Kategori Kayması Uyarı Algoritması
+            let textForAnalysis = rawText.toLowerCase();
+            let autoDetectedCategory = currentCategory;
+            if(textForAnalysis.includes("teleskop") || textForAnalysis.includes("ay")) autoDetectedCategory = "Başlangıç Astronom";
+            if(textForAnalysis.includes("satürn") || textForAnalysis.includes("nebula")) autoDetectedCategory = "Amatör Astronom";
+            if(textForAnalysis.includes("esp32") || textForAnalysis.includes("python")) autoDetectedCategory = "Profesyonel Astronom";
+
+            if(autoDetectedCategory !== currentCategory && !isAdmin) {
+                document.getElementById('category-select').value = autoDetectedCategory;
+                chatRooms[activeRoom].push({ sender: "AI CORE", text: `⚠️ Rütbe otomatik dengelendi: ${autoDetectedCategory}`, type: "error-msg" });
+            }
+
+            inputField.value = "";
+            renderRooms(); // Mesaj sayılarını güncelle
+            loadRoomChat(activeRoom); // Ekranı kaydır
+        }
+
+        // PROFİL SİSTEMİ
         function viewProfile(clickName = null) {
             let targetUser = clickName ? clickName : document.getElementById('search-user').value;
             if(!targetUser) return;
 
-            // Eğer veritabanında yoksa otomatik oluştur (Simülasyon)
             if(!userDatabase[targetUser]) {
                 userDatabase[targetUser] = { rank: "Başlangıç Astronom", status: "Aktif", warns: 0, banyok: true };
             }
@@ -254,116 +404,39 @@
             document.getElementById('profile-display').style.display = "block";
         }
 
-        // --- ADMİN ÖZEL YETKİ KODLARI ---
-
-        // 1. BANLAMA YETKİSİ
+        // MODERASYON İŞLEMLERİ
         function adminBan() {
             if(!isAdmin) return;
             let user = document.getElementById('search-user').value;
             if(userDatabase[user]) {
-                userDatabase[user].status = "SİTEDEN BANLANDI (PERMA)";
+                userDatabase[user].status = "BANLANDI (PERMA)";
                 userDatabase[user].banyok = false;
-                logToChat("MODERASYON", `${user} kullanıcısı Başkomutan emriyle SİTEDEN BANLANDI!`, "error-msg");
-                viewProfile(user); // Profili güncelle
+                chatRooms[activeRoom].push({ sender: "MODERASYON", text: `${user} sunucudan tamamen BANLANDI!`, type: "error-msg" });
+                viewProfile(user); loadRoomChat(activeRoom);
             }
         }
 
-        // 2. CEZALANDIRMA (SUSTURMA) YETKİSİ
         function adminMute() {
             if(!isAdmin) return;
             let user = document.getElementById('search-user').value;
             if(userDatabase[user]) {
-                userDatabase[user].warns += 1;
                 userDatabase[user].status = "CEZALI (SUSTURULDU)";
-                logToChat("MODERASYON", `${user} susturuldu. Ceza Puanı: ${userDatabase[user].warns}`, "error-msg");
-                viewProfile(user);
+                chatRooms[activeRoom].push({ sender: "MODERASYON", text: `${user} geçici olarak susturuldu!`, type: "error-msg" });
+                viewProfile(user); loadRoomChat(activeRoom);
             }
         }
 
-        // 3. CEZA SIFIRLA YETKİSİ
-        function adminResetWarns() {
-            if(!isAdmin) return;
-            let user = document.getElementById('search-user').value;
-            if(userDatabase[user]) {
-                userDatabase[user].warns = 0;
-                userDatabase[user].status = "Aktif";
-                userDatabase[user].banyok = true;
-                logToChat("MODERASYON", `${user} kullanıcısının tüm cezaları affedildi.`, "admin-msg");
-                viewProfile(user);
-            }
-        }
-
-        // 4. SOHBETİ TEMİZLEME YETKİSİ
         function adminClearChat() {
             if(!isAdmin) return;
-            document.getElementById('chat-area').innerHTML = `<p class="admin-msg">[SİSTEM] Sohbet geçmişi Admin tarafından sıfırlandı.</p>`;
+            chatRooms[activeRoom] = [{ sender: "SİSTEM", text: "[SİSTEM] Bu oda temizlendi.", type: "system-msg" }];
+            loadRoomChat(activeRoom);
+            renderRooms();
         }
 
-        // --- MANEVRA VE MESAJ AKIŞI ---
         function sendHardware(route) {
             if(!isAdmin) return;
             let ip = document.getElementById('espIp').value;
-            logToChat("ADMIN-CMD", "Motor Sinyali -> " + route, "admin-msg");
             fetch(ip + route).catch(e => {});
-        }
-
-        function processMessage() {
-            let inputField = document.getElementById('chat-input');
-            let user = document.getElementById('username-input').value;
-            let rawText = inputField.value;
-            let currentCategory = document.getElementById('category-select').value;
-
-            if(rawText.trim() === "") return;
-
-            // Banlı veya Cezalı Kontrolü
-            if(userDatabase[user] && userDatabase[user].banyok === false) {
-                alert("Siteden banlandınız! Mesaj gönderemezsiniz.");
-                return;
-            }
-            if(userDatabase[user] && userDatabase[user].status === "CEZALI (SUSTURULDU)") {
-                alert("Cezalısınız! Şu an susturulmuş durumdasınız.");
-                return;
-            }
-
-            // Küfür Kontrolü
-            let cleanText = rawText.toLowerCase();
-            if(bannedWords.some(word => cleanText.includes(word))) {
-                logToChat("KORUMA", `UYARI: Küfür engellendi! ${user} otomatik ceza puanı aldı.`, "error-msg");
-                if(!userDatabase[user]) userDatabase[user] = { rank: currentCategory, status: "Aktif", warns: 0, banyok: true };
-                userDatabase[user].warns += 1;
-                inputField.value = "";
-                return;
-            }
-
-            // Ekrana Yazma (İsimlere tıklama fonksiyonu entegre edildi)
-            let msgClass = isAdmin ? "admin-msg" : "user-msg";
-            let chatArea = document.getElementById('chat-area');
-            chatArea.innerHTML += `<p class="${msgClass}"><strong>[<span onclick="viewProfile('${user}')" style="cursor:pointer; text-decoration:underline;">${user}</span>]:</strong> ${rawText} <span class="category-tag">[${currentCategory}]</span></p>`;
-            
-            // Kategori Zekası
-            let textForAnalysis = rawText.toLowerCase();
-            let autoDetectedCategory = currentCategory;
-            if(textForAnalysis.includes("teleskop") || textForAnalysis.includes("ay")) autoDetectedCategory = "Başlangıç Astronom";
-            if(textForAnalysis.includes("satürn") || textForAnalysis.includes("nebula")) autoDetectedCategory = "Amatör Astronom";
-            if(textForAnalysis.includes("esp32") || textForAnalysis.includes("python")) autoDetectedCategory = "Profesyonel Astronom";
-
-            if(autoDetectedCategory !== currentCategory && !isAdmin) {
-                logToChat("AI CORE", `Rütbe otomatik güncellendi: ${autoDetectedCategory}`, "error-msg");
-                document.getElementById('category-select').value = autoDetectedCategory;
-            }
-
-            inputField.value = "";
-            chatArea.scrollTop = chatArea.scrollHeight;
-        }
-
-        function logToChat(sender, message, className) {
-            let chatArea = document.getElementById('chat-area');
-            chatArea.innerHTML += `<p class="${className}"><strong>[${sender}]:</strong> ${message}</p>`;
-            chatArea.scrollTop = chatArea.scrollHeight;
-        }
-
-        function toggleChat() {
-            document.getElementById('chat-panel').style.display = "none";
         }
     </script>
 </body>
